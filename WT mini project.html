@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Form Validation</title>
+
+  <!-- CSS Styling -->
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      margin: auto;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 90%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #28a745;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #strength {
+      height: 10px;
+      width: 100%;
+      margin-top: 5px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Container -->
+  <div id="app">
+    <!-- Registration Form -->
+    <div id="form-route">
+      <h2>Register</h2>
+      <form id="registerForm">
+        <label>
+          Username:
+          <input type="text" id="username" required />
+        </label>
+
+        <label>
+          Email:
+          <input type="email" id="email" required />
+        </label>
+
+        <label>
+          Password:
+          <input type="password" id="password" required />
+          <div id="strength"></div>
+        </label>
+
+        <label>
+          <input type="checkbox" onclick="togglePassword()"> Show Password
+        </label>
+
+        <button type="submit">Register</button>
+      </form>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success-route" style="display: none;">
+      <h2>🎉 Registration Successful!</h2>
+      <p>Welcome, <span id="userDisplay"></span>!</p>
+      <button onclick="goBack()">Go Back</button>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Show password toggle
+    function togglePassword() {
+      const input = document.getElementById("password");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // Password strength meter
+    document.getElementById("password").addEventListener("input", function () {
+      const password = this.value;
+      const strengthBar = document.getElementById("strength");
+
+      let strength = 0;
+      if (password.length >= 8) strength += 1;
+      if (/[A-Z]/.test(password)) strength += 1;
+      if (/[0-9]/.test(password)) strength += 1;
+      if (/[@$!%*?&]/.test(password)) strength += 1;
+
+      const colors = ["red", "orange", "yellow", "green"];
+      strengthBar.style.background = colors[strength - 1] || "gray";
+      strengthBar.style.width = `${strength * 25}%`;
+    });
+
+    // Form submission and validation
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (username.length < 3) {
+        alert("Username must be at least 3 characters.");
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        alert("Password is not strong enough.");
+        return;
+      }
+
+      // Client-side routing: switch screens
+      document.getElementById("form-route").style.display = "none";
+      document.getElementById("success-route").style.display = "block";
+      document.getElementById("userDisplay").innerText = username;
+    });
+
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function validatePassword(pw) {
+      return (
+        pw.length >= 8 &&
+        /[A-Z]/.test(pw) &&
+        /[0-9]/.test(pw) &&
+        /[@$!%*?&]/.test(pw)
+      );
+    }
+
+    function goBack() {
+      document.getElementById("success-route").style.display = "none";
+      document.getElementById("form-route").style.display = "block";
+    }
+  </script>
+</body>
+</html>
